@@ -9,7 +9,7 @@ Esta API REST debe coincidir con algunas
 requisitos:
 
 * [x] `GET /shirts` returns list of shirts as JSON
-* [ ] `GET /shirts/{id}` returns details of specific coaster as JSON
+* [x] `GET /shirts/{id}` returns details of specific coaster as JSON
 * [x] `POST /shirts` accepts a new shirt to be added
 * [x] `POST /shirts` returns status 415 if content is not `application/json`
 * [ ] `GET /admin` requires basic auth
