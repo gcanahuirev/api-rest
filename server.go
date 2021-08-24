@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -21,6 +22,10 @@ type shirtHandlers struct {
 	sync.Mutex
 	store map[string] Shirt
 }
+type adminPortal struct {
+	password string
+}
+
 func (h *shirtHandlers) shirts(w http.ResponseWriter, r *http.Request)  {
 	switch r.Method {
 		case "GET":
@@ -117,11 +122,32 @@ func newShirtHandlers() *shirtHandlers  {
 		store: map[string]Shirt{},
 	}
 }
+func newAdminPortal()  *adminPortal{
+	password := os.Getenv("ADMIN_PASSWORD")
+	if password == "" {
+		panic("required env var ADMIN_PASSWORD not set")
+	}
+	return &adminPortal{password: password}
+}
+
+func (a adminPortal) handler(w http.ResponseWriter, r *http.Request){
+	user, pass, ok := r.BasicAuth()
+
+	if !ok || user != "admin" || pass != a.password {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("401 - unauthorized"))
+		return
+	}
+
+	w.Write([]byte("<html><h1>secret admin portal</h1></html>"))
+}
 
 func main()  {
+	admin := newAdminPortal()
 	shirtHandlers := newShirtHandlers()
 	http.HandleFunc("/shirts", shirtHandlers.shirts)
 	http.HandleFunc("/shirts/", shirtHandlers.getShirt)
+	http.HandleFunc("/admin", admin.handler)
 
 	err := http.ListenAndServe("localhost:3000", nil)
 	if err != nil {

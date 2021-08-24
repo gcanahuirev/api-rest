@@ -12,7 +12,7 @@ requisitos:
 * [x] `GET /shirts/{id}` returns details of specific coaster as JSON
 * [x] `POST /shirts` accepts a new shirt to be added
 * [x] `POST /shirts` returns status 415 if content is not `application/json`
-* [ ] `GET /admin` requires basic auth
+* [x] `GET /admin` requires basic auth
 * [ ] `GET /shirts/random` redirects (Status 302) to a random shirt
 
 ### Data Types
@@ -26,5 +26,14 @@ Un objeto de camisa debería verse así:
 }
 ```
 
+Nota: Si esta usando pwsh, tenga esto en cuenta 
+- Para `GET /admin`, primero deberá configurar la clave
+``` pwsh
+> $env:ADMIN_PASSWORD = 'secret'
+```
+- Para probar el authbasic
+``` pwsh
+> curl localhost:3000/admin -u admin:secret
+```
 ### Persistencia
 No hay persistencia, un tiempo en memoria está bien.
