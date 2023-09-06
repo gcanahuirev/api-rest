@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -180,7 +181,9 @@ func main()  {
 	http.HandleFunc("/shirts/", shirtHandlers.getShirt)
 	http.HandleFunc("/admin", admin.handler)
 
-	err := http.ListenAndServe("localhost:3000", nil)
+	addr := "localhost:3000"
+	log.Println("Server is running at", addr)
+	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		panic(err)
 	}
