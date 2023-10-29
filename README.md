@@ -1,39 +1,60 @@
-# api-rest
-> Ejemplo simple de api rest sin dependencias
+# Simple api rest in memory
 
-* No third-party **packages/dependencies**
-* Puede utilizar curl o algún cliente **http** para las consultas
+Simple test of api rest without dependencies, but in memory
 
-## Requerimientos
-Esta API REST debe coincidir con algunos requisitos:
+- No third-party `packages/dependencies`
+- You can use curl or a `http`  client for requests
 
-* [x] `GET /shirts` returns list of shirts as JSON
-* [x] `GET /shirts/{id}` returns details of specific coaster as JSON
-* [x] `POST /shirts` accepts a new shirt to be added
-* [x] `POST /shirts` returns status 415 if content is not `application/json`
-* [x] `GET /admin` requires basic auth
-* [x] `GET /shirts/random` redirects (Status 302) to a random shirt
+## Requirements
+
+- Go stable version
+
+## Features
+
+- [x] `GET /shirts` returns list of shirts as JSON
+- [x] `GET /shirts/{id}` returns details of specific shirt as JSON
+- [x] `POST /shirts` accepts a new shirt to be added
+- [x] `POST /shirts` returns status 415 if content is not `application/json`
+- [x] `GET /admin` requires basic auth
+- [x] `GET /shirts/random` redirects (Status 302) to a random shirt
 
 ### Data Types
-Un objeto de camisa debería verse así:
+
+A shirt object should look like this:
+
 ```json
 {
-  "class" : "Manga Larga",
-  "material" : "Lana",
   "id" : "0001",
+  "material" : "Lana",
+  "class" : "Manga Larga",
   "size" : 14,
 }
 ```
 
-Nota: Si esta usando pwsh, tenga esto en cuenta 
-- Para `GET /admin`, primero deberá configurar la clave
-``` pwsh
+## Usage
+
+Note: If you are using pwsh, please note this
+
+- First configure the password, then run `go run server.go`
+
+``` sh
 > $env:ADMIN_PASSWORD = 'secret'
 ```
-- Para probar el authbasic
-``` pwsh
+
+- Or just run
+
+``` sh
+> ADMIN_PASSWORD='secret' go run server.go
+```
+
+- To test basic authentication
+
+``` sh
 > curl localhost:3000/admin -u admin:secret
 ```
-- Recuerde que tendra que agregar nuevos datos en cada reinicio
-### Persistencia
-No hay persistencia de datos, un tiempo en memoria está bien.
+
+- Remember that you will have to add new data at each restart
+
+### Persistence
+
+There is no persistence of data, a memory time is fine.
