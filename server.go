@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"math/rand"
 	"net/http"
@@ -83,7 +83,7 @@ func (h *shirtHandlers) getRandomShirt(w http.ResponseWriter, r *http.Request) {
 	} else if len(ids) == 1 {
 		target = ids[0]
 	} else {
-		rand.Seed(time.Now().UnixNano())
+		rand.New(rand.NewSource(time.Now().UnixNano()))
 		target = ids[rand.Intn((len(ids)))]
 	}
 
@@ -122,7 +122,7 @@ func (h *shirtHandlers) getShirt(w http.ResponseWriter, r *http.Request)  {
 }
 
 func (h *shirtHandlers) post(w http.ResponseWriter, r *http.Request)  {
-	bodyBytes, err := ioutil.ReadAll(r.Body)
+	bodyBytes, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

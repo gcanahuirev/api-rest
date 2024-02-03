@@ -1,3 +1,3 @@
 module github.com/gcanahuirev/api-rest
 
-go 1.21.3
+go 1.21.6
