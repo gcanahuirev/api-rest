@@ -43,7 +43,7 @@ func (h *shirtHandlers) shirts(w http.ResponseWriter, r *http.Request)  {
 	}
 }
 
-func (h *shirtHandlers) get(w http.ResponseWriter, r *http.Request)  {
+func (h *shirtHandlers) get(w http.ResponseWriter, _ *http.Request)  {
 	shirts := make([]Shirt, len(h.store))
 
 	h.Lock()
@@ -65,7 +65,7 @@ func (h *shirtHandlers) get(w http.ResponseWriter, r *http.Request)  {
 	w.Write(jsonBytes)
 }
 
-func (h *shirtHandlers) getRandomShirt(w http.ResponseWriter, r *http.Request) {
+func (h *shirtHandlers) getRandomShirt(w http.ResponseWriter, _ *http.Request) {
 	ids := make([]string, len(h.store))
 	h.Lock()
 	i := 0
