@@ -35,7 +35,7 @@ A shirt object should look like this:
 
 Note: If you are using pwsh, please note this
 
-- First configure the password, then run `go run server.go`
+- First configure the password, then run `go run cmd/main.go`
 
 ``` sh
 > $env:ADMIN_PASSWORD = 'secret'
@@ -44,7 +44,7 @@ Note: If you are using pwsh, please note this
 - Or just run
 
 ``` sh
-> ADMIN_PASSWORD='secret' go run server.go
+> ADMIN_PASSWORD='secret' go run cmd/main.go
 ```
 
 - To test basic authentication

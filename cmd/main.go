@@ -14,36 +14,36 @@ import (
 )
 
 type Shirt struct {
-	Class     string `json:"class"`
-	Material 	string `json:"material"`
-	Id       	string `json:"id"`  
-	Size     	int16  `json:"size"`
+	Class    string `json:"class"`
+	Material string `json:"material"`
+	Id       string `json:"id"`
+	Size     int16  `json:"size"`
 }
 
 type shirtHandlers struct {
 	sync.Mutex
-	store map[string] Shirt
+	store map[string]Shirt
 }
 type adminPortal struct {
 	password string
 }
 
-func (h *shirtHandlers) shirts(w http.ResponseWriter, r *http.Request)  {
+func (h *shirtHandlers) shirts(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-		case "GET":
-			h.get(w,r)
-			return
-		case "POST":
-			h.post(w, r)
-			return
-		default:
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			w.Write([]byte("method not allowed"))
-			return 
+	case "GET":
+		h.get(w, r)
+		return
+	case "POST":
+		h.post(w, r)
+		return
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("method not allowed"))
+		return
 	}
 }
 
-func (h *shirtHandlers) get(w http.ResponseWriter, _ *http.Request)  {
+func (h *shirtHandlers) get(w http.ResponseWriter, _ *http.Request) {
 	shirts := make([]Shirt, len(h.store))
 
 	h.Lock()
@@ -83,21 +83,22 @@ func (h *shirtHandlers) getRandomShirt(w http.ResponseWriter, _ *http.Request) {
 	} else if len(ids) == 1 {
 		target = ids[0]
 	} else {
-		rand.New(rand.NewSource(time.Now().UnixNano()))
-		target = ids[rand.Intn((len(ids)))]
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		target = ids[r.Intn(len(ids))]
 	}
 
 	w.Header().Add("location", fmt.Sprintf("/shirts/%s", target))
 	w.WriteHeader(http.StatusFound)
 }
-func (h *shirtHandlers) getShirt(w http.ResponseWriter, r *http.Request)  {
+
+func (h *shirtHandlers) getShirt(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(r.URL.String(), "/")
 	if len(parts) != 3 {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	if parts[2] == "random"{
+	if parts[2] == "random" {
 		h.getRandomShirt(w, r)
 		return
 	}
@@ -121,18 +122,19 @@ func (h *shirtHandlers) getShirt(w http.ResponseWriter, r *http.Request)  {
 	w.Write(jsonBytes)
 }
 
-func (h *shirtHandlers) post(w http.ResponseWriter, r *http.Request)  {
+func (h *shirtHandlers) post(w http.ResponseWriter, r *http.Request) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
+		return
 	}
 
 	ct := r.Header.Get("content-type")
 	if ct != "application/json" {
 		w.WriteHeader(http.StatusUnsupportedMediaType)
-		w.Write([]byte(fmt.Sprintf("need content-type 'application/json', but got'%s'", ct)))
+		w.Write(fmt.Appendf(nil, "need content-type 'application/json', but got'%s'", ct))
 		return
 	}
 
@@ -141,6 +143,7 @@ func (h *shirtHandlers) post(w http.ResponseWriter, r *http.Request)  {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
+		return
 	}
 	shirt.Id = fmt.Sprintf("%d", time.Now().UnixNano())
 
@@ -149,12 +152,13 @@ func (h *shirtHandlers) post(w http.ResponseWriter, r *http.Request)  {
 	defer h.Unlock()
 }
 
-func newShirtHandlers() *shirtHandlers  {
+func newShirtHandlers() *shirtHandlers {
 	return &shirtHandlers{
 		store: map[string]Shirt{},
 	}
 }
-func newAdminPortal()  *adminPortal{
+
+func newAdminPortal() *adminPortal {
 	password := os.Getenv("ADMIN_PASSWORD")
 	if password == "" {
 		panic("required env var ADMIN_PASSWORD not set")
@@ -162,7 +166,7 @@ func newAdminPortal()  *adminPortal{
 	return &adminPortal{password: password}
 }
 
-func (a adminPortal) handler(w http.ResponseWriter, r *http.Request){
+func (a adminPortal) handler(w http.ResponseWriter, r *http.Request) {
 	user, pass, ok := r.BasicAuth()
 
 	if !ok || user != "admin" || pass != a.password {
@@ -174,7 +178,7 @@ func (a adminPortal) handler(w http.ResponseWriter, r *http.Request){
 	w.Write([]byte("<html><h1>secret admin portal</h1></html>"))
 }
 
-func main()  {
+func main() {
 	admin := newAdminPortal()
 	shirtHandlers := newShirtHandlers()
 	http.HandleFunc("/shirts", shirtHandlers.shirts)
