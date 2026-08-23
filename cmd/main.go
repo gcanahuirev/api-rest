@@ -123,33 +123,42 @@ func (h *shirtHandlers) getShirt(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *shirtHandlers) post(w http.ResponseWriter, r *http.Request) {
-	bodyBytes, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+
+	if r.Header.Get("Content-Type") != "application/json" {
+		http.Error(
+			w,
+			fmt.Sprintf("need content-type 'application/json', but got '%s'",
+				r.Header.Get("Content-Type")),
+			http.StatusUnsupportedMediaType,
+		)
 		return
 	}
 
-	ct := r.Header.Get("content-type")
-	if ct != "application/json" {
-		w.WriteHeader(http.StatusUnsupportedMediaType)
-		w.Write(fmt.Appendf(nil, "need content-type 'application/json', but got'%s'", ct))
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	var shirt Shirt
-	err = json.Unmarshal(bodyBytes, &shirt)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
+	if err := json.Unmarshal(bodyBytes, &shirt); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	shirt.Id = fmt.Sprintf("%d", time.Now().UnixNano())
 
 	h.Lock()
 	h.store[shirt.Id] = shirt
-	defer h.Unlock()
+	h.Unlock()
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	if err := json.NewEncoder(w).Encode(shirt); err != nil {
+		return
+	}
 }
 
 func newShirtHandlers() *shirtHandlers {

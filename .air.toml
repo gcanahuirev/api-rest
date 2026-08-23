@@ -4,20 +4,20 @@
 env_files = []
 root = "."
 testdata_dir = "testdata"
-tmp_dir = "tmp"
+tmp_dir = "bin/tmp"
 
 [build]
 args_bin = []
-bin = "./tmp/main"
-cmd = "go build -o tmp/main cmd/main.go"
+bin = "./bin/main"
+cmd = "go build -o bin/main cmd/main.go"
 delay = 1000
-entrypoint = ["./tmp/main"]
+entrypoint = ["./bin/main"]
 exclude_dir = ["assets", "tmp", "vendor", "testdata"]
 exclude_file = []
 exclude_regex = ["_test.go"]
 exclude_unchanged = false
 follow_symlink = false
-full_bin = "ADMIN_PASSWORD=secret ./tmp/main"
+full_bin = "ADMIN_PASSWORD=secret ./bin/main"
 ignore_dangerous_root_dir = false
 include_dir = []
 include_ext = ["go", "tpl", "tmpl", "html"]
